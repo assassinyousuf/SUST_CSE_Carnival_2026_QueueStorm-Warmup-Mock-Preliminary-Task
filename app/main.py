@@ -11,7 +11,7 @@ Render / Railway / Fly / Vercel / EC2 / Poridhi Lab behind HTTPS.
 
 import os
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 
 from app.classifier import classify
 
@@ -56,6 +56,15 @@ def sort_ticket():
     result = classify(message)
     response = {"ticket_id": ticket_id, **result}
     return jsonify(response), 200
+
+
+@app.get("/")
+def index():
+    """Serve the frontend index.html file."""
+    index_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "index.html")
+    if os.path.exists(index_path):
+        return send_file(index_path)
+    return jsonify({"error": "Not found. Use GET /health or POST /sort-ticket."}), 404
 
 
 @app.errorhandler(404)
